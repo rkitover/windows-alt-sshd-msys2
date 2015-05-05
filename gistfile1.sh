@@ -39,7 +39,7 @@ fi
 #
 
 # Some random password; this is only needed internally by cygrunsrv and
-# is limited to 14 characters (lol)
+# is limited to 14 characters by Windows (lol)
 tmp_pass="$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)"
 
 # Create user
