@@ -43,14 +43,14 @@ fi
 tmp_pass="$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)"
 
 # Create user
-add=""; if ! net user "${PRIV_USER}" >/dev/null; then add="//add"; fi
+add="$(if ! net user "${PRIV_USER}" >/dev/null; then echo "//add"; fi)"
 net user "${PRIV_USER}" "${tmp_pass}" ${add} //fullname:"${PRIV_NAME}" \
          //homedir:"$(cygpath -w ${EMPTY_DIR})" //yes
 
 # Add user to the Administrators group if necessary
 admingroup="$(mkgroup -l | awk -F: '{if ($2 == "S-1-5-32-544") print $1;}')"
 if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'$'); then
-    net localgroup "${admingroup}" "${PRIV_USER}" ${add}
+    net localgroup "${admingroup}" "${PRIV_USER}" //add
 fi
 
 # Infinite passwd expiry
@@ -68,7 +68,7 @@ passwd -e "${PRIV_USER}"
 # The unprivileged sshd user (for privilege separation)
 #
 
-add=""; if ! net user "${UNPRIV_USER}" >/dev/null; then add="//add"; fi
+add="$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)"
 net user "${UNPRIV_USER}" ${add} //fullname:"${UNPRIV_NAME}" \
          //homedir:"$(cygpath -w ${EMPTY_DIR})" //active:no
 
