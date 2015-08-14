@@ -8,6 +8,8 @@ set -e
 
 PRIV_USER=sshd_server
 PRIV_NAME="Privileged server"
+UNPRIV_USER=sshd # Do not change this; it is hardcoded inside sshd
+UNPRIV_NAME="Privilege separation user for sshd"
 
 EMPTY_DIR=/var/empty
 
@@ -74,8 +76,6 @@ done
 # The unprivileged sshd user (for privilege separation)
 #
 
-UNPRIV_USER=sshd # This username is hardcoded inside sshd
-UNPRIV_NAME="Privilege separation user for sshd"
 add="$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)"
 if ! net user "${UNPRIV_USER}" ${add} //fullname:"${UNPRIV_NAME}" \
               //homedir:"$(cygpath -w ${EMPTY_DIR})" //active:no; then
