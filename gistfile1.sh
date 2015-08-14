@@ -8,11 +8,8 @@
 #    — MSYS2 itself: http://sourceforge.net/projects/msys2/
 #    — admin tools: pacman -S openssh cygrunsrv mingw-w64-x86_64-editrights
 #
-#  This script is free software. It comes without any warranty, to
-#  the extent permitted by applicable law. You can redistribute it
-#  and/or modify it under the terms of the Do What the Fuck You Want
-#  to Public License, Version 2, as published by the WTFPL Task Force.
-#  See http://www.wtfpl.net/ for more details.
+#  This script is a cleaned up and improved version of the procedure initially
+#  found at https://ghc.haskell.org/trac/ghc/wiki/Building/Windows/SSHD
 #
 
 set -e
