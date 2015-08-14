@@ -1,4 +1,19 @@
 #!/bin/sh
+#
+#  msys2-sshd-setup.sh — configure sshd on MSYS2 and run it as a Windows service
+#
+#  Please report issues and/or improvements to Sam Hocevar <sam@hocevar.net>
+#
+#  Prerequisites:
+#    — MSYS2 itself: http://sourceforge.net/projects/msys2/
+#    — admin tools: pacman -S openssh cygrunsrv mingw-w64-x86_64-editrights
+#
+#  This script is free software. It comes without any warranty, to
+#  the extent permitted by applicable law. You can redistribute it
+#  and/or modify it under the terms of the Do What the Fuck You Want
+#  to Public License, Version 2, as published by the WTFPL Task Force.
+#  See http://www.wtfpl.net/ for more details.
+#
 
 set -e
 
@@ -7,8 +22,8 @@ set -e
 #
 
 PRIV_USER=sshd_server
-PRIV_NAME="Privileged server"
-UNPRIV_USER=sshd # Do not change this; it is hardcoded inside sshd
+PRIV_NAME="Privileged user for sshd"
+UNPRIV_USER=sshd # DO NOT CHANGE; this username is hardcoded in the openssh code
 UNPRIV_NAME="Privilege separation user for sshd"
 
 EMPTY_DIR=/var/empty
