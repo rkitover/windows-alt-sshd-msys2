@@ -11,6 +11,9 @@
 #  This script is a cleaned up and improved version of the procedure initially
 #  found at https://ghc.haskell.org/trac/ghc/wiki/Building/Windows/SSHD
 #
+#  Changelog:
+#   24 Aug 2015 — run server with -e to redirect logs to /var/log/sshd.log
+#
 
 set -e
 
@@ -115,7 +118,7 @@ done
 
 cygrunsrv -R sshd || true
 cygrunsrv -I sshd -d "MSYS2 sshd" -p \
-          /usr/bin/sshd.exe -a -D -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}"
+          /usr/bin/sshd.exe -a "-D -e" -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}"
 
 # The SSH service should start automatically when Windows is rebooted. You can
 # manually restart the service by running `net stop sshd` + `net start sshd`
