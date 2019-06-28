@@ -11,6 +11,11 @@
 #  This script is a cleaned up and improved version of the procedure initially
 #  found at https://ghc.haskell.org/trac/ghc/wiki/Building/Windows/SSHD
 #
+#  Gotchas:
+#    — the log file will be /var/log/msys2_sshd.log
+#    — if you get error “sshd: fatal: seteuid XXX : No such device or address”
+#      in the logs, try “passwd -R” (with admin privileges)
+#
 #  Changelog:
 #   27 Jun 2019 — rename service to msys2_sshd to avoid conflicts with Windows OpenSSH
 #               — use mkgroup.exe as suggested in the comments
