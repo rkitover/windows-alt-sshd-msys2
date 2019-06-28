@@ -12,6 +12,8 @@
 #  found at https://ghc.haskell.org/trac/ghc/wiki/Building/Windows/SSHD
 #
 #  Changelog:
+#   27 Jun 2019 — rename service to msys2_sshd to avoid conflicts with Windows OpenSSH
+#               — Use mkgroup.exe as suggested in the comments
 #   24 Aug 2015 — run server with -e to redirect logs to /var/log/sshd.log
 #
 
@@ -110,6 +112,7 @@ for u in "${PRIV_USER}" "${UNPRIV_USER}"; do
     mkpasswd -l -u "${u}" | sed -e 's/^[^:]*+//' | sed -ne "${SED}" \
              >> /etc/passwd
 done
+mkgroup.exe -l > /etc/group
 
 
 #
