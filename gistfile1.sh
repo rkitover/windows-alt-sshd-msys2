@@ -116,13 +116,13 @@ done
 # Finally, register service with cygrunsrv and start it
 #
 
-cygrunsrv -R sshd || true
-cygrunsrv -I sshd -d "MSYS2 sshd" -p \
+cygrunsrv -R msys2_sshd || true
+cygrunsrv -I msys2_sshd -d "MSYS2 sshd" -p \
           /usr/bin/sshd.exe -a "-D -e" -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}"
 
 # The SSH service should start automatically when Windows is rebooted. You can
-# manually restart the service by running `net stop sshd` + `net start sshd`
-if ! net start sshd; then
-    echo "ERROR: Unable to start sshd service"
+# manually restart the service by running `net stop msys2_sshd` + `net start msys2_sshd`
+if ! net start msys2_sshd; then
+    echo "ERROR: Unable to start msys2_sshd service"
     exit 1
 fi
