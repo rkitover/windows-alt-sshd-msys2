@@ -13,7 +13,8 @@
 #
 #  Changelog:
 #   27 Jun 2019 — rename service to msys2_sshd to avoid conflicts with Windows OpenSSH
-#               — Use mkgroup.exe as suggested in the comments
+#               — use mkgroup.exe as suggested in the comments
+#               — fix a problem with CRLF and grep
 #   24 Aug 2015 — run server with -e to redirect logs to /var/log/sshd.log
 #
 
@@ -69,7 +70,7 @@ fi
 
 # Add user to the Administrators group if necessary
 admingroup="$(mkgroup -l | awk -F: '{if ($2 == "S-1-5-32-544") print $1;}')"
-if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'$'); then
+if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'\>'); then
     if ! net localgroup "${admingroup}" "${PRIV_USER}" //add; then
         echo "ERROR: Unable to add user ${PRIV_USER} to group ${admingroup}"
         exit 1
