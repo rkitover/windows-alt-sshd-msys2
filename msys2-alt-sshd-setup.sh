@@ -1,26 +1,15 @@
 #!/bin/sh
 #
-#  msys2-sshd-setup.sh — configure sshd on MSYS2 and run it as a Windows service
+#  msys2-alt-sshd-setup.sh — configure sshd on MSYS2 on port 2222 and run it as a Windows service
 #
-#  Please report issues and/or improvements to Sam Hocevar <sam@hocevar.net>
+#  This script is a fork of this gist:
 #
-#  Prerequisites:
-#    — MSYS2 itself: http://sourceforge.net/projects/msys2/
-#    — admin tools: pacman -S openssh cygrunsrv mingw-w64-x86_64-editrights
-#
-#  This script is a cleaned up and improved version of the procedure initially
-#  found at https://ghc.haskell.org/trac/ghc/wiki/Building/Windows/SSHD
+#  https://gist.github.com/samhocevar/00eec26d9e9988d080ac
 #
 #  Gotchas:
 #    — the log file will be /var/log/msys2_sshd.log
 #    — if you get error “sshd: fatal: seteuid XXX : No such device or address”
 #      in the logs, try “passwd -R” (with admin privileges)
-#
-#  Changelog:
-#   27 Jun 2019 — rename service to msys2_sshd to avoid conflicts with Windows OpenSSH
-#               — use mkgroup.exe as suggested in the comments
-#               — fix a problem with CRLF and grep
-#   24 Aug 2015 — run server with -e to redirect logs to /var/log/sshd.log
 #
 
 set -e
@@ -36,26 +25,23 @@ UNPRIV_NAME="Privilege separation user for sshd"
 
 EMPTY_DIR=/var/empty
 
+mkdir -p "$EMPTY_DIR"
+mkdir -p /var/log
 
 #
-# Check installation sanity
+# Make sure needed packages are installed.
 #
 
-if ! /mingw64/bin/editrights -h >/dev/null; then
-    echo "ERROR: Missing 'editrights'. Try: pacman -S mingw-w64-x86_64-editrights."
-    exit 1
-fi
+pacman --noconfirm -Sy
+pacman --noconfirm -S --needed openssh cygrunsrv mingw-w64-x86_64-editrights
 
-if ! cygrunsrv -v >/dev/null; then
-    echo "ERROR: Missing 'cygrunsrv'. Try: pacman -S cygrunsrv."
-    exit 1
-fi
+#
+# Generate ssh host keys.
+#
 
-if ! ssh-keygen -A; then
-    echo "ERROR: Missing 'ssh-keygen'. Try: pacman -S openssh."
-    exit 1
+if [ ! -f /etc/ssh/ssh_host_rsa_key.pub ]; then
+    ssh-keygen -A
 fi
-
 
 #
 # The privileged cyg_server user
@@ -63,7 +49,7 @@ fi
 
 # Some random password; this is only needed internally by cygrunsrv and
 # is limited to 14 characters by Windows (lol)
-tmp_pass="$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)"
+tmp_pass=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)
 
 # Create user
 add="$(if ! net user "${PRIV_USER}" >/dev/null; then echo "//add"; fi)"
@@ -74,7 +60,7 @@ if ! net user "${PRIV_USER}" "${tmp_pass}" ${add} //fullname:"${PRIV_NAME}" \
 fi
 
 # Add user to the Administrators group if necessary
-admingroup="$(mkgroup -l | awk -F: '{if ($2 == "S-1-5-32-544") print $1;}')"
+admingroup=$(mkgroup -l | awk -F: '{if ($2 == "S-1-5-32-544") print $1;}')
 if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'\>'); then
     if ! net localgroup "${admingroup}" "${PRIV_USER}" //add; then
         echo "ERROR: Unable to add user ${PRIV_USER} to group ${admingroup}"
@@ -99,7 +85,7 @@ done
 # The unprivileged sshd user (for privilege separation)
 #
 
-add="$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)"
+add=$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "//add"; fi)
 if ! net user "${UNPRIV_USER}" ${add} //fullname:"${UNPRIV_NAME}" \
               //homedir:"$(cygpath -w ${EMPTY_DIR})" //active:no; then
     echo "ERROR: Unable to create Windows user ${PRIV_USER}"
@@ -120,12 +106,30 @@ for u in "${PRIV_USER}" "${UNPRIV_USER}"; do
 done
 mkgroup.exe -l > /etc/group
 
+#
+# Set port to 2222 in sshd config.
+#
+
+if grep -qEi '^ *#? *Port( |$)' /etc/ssh/sshd_config; then
+    sed -i -E 's/^ *#? *Port( |$).*/Port 2222/' /etc/ssh/sshd_config
+else
+    printf '# Added by msys2-alt-sshd-setup.sh:\nPort 2222\n' >> /etc/ssh/sshd_config
+fi
+
+#
+# Add firewall rule.
+#
+netsh advfirewall firewall delete rule name=msys2_sshd 2>/dev/null || :
+
+if ! netsh advfirewall firewall add rule name=msys2_sshd dir=in action=allow protocol=TCP localport=2222; then
+    echo "WARNING: unable to add firewall rule to open port 2222"
+fi
 
 #
 # Finally, register service with cygrunsrv and start it
 #
 
-cygrunsrv -R msys2_sshd || true
+cygrunsrv -R msys2_sshd 2>/dev/null || :
 cygrunsrv -I msys2_sshd -d "MSYS2 sshd" -p \
           /usr/bin/sshd.exe -a "-D -e" -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}"
 
