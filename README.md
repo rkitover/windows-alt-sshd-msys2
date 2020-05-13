@@ -102,7 +102,7 @@ instead of using a password:
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 ```
 
-### Microsoft Windows Terminal Preview Setup
+### Microsoft Windows Terminal Setup
 
 This requires OpenSSH set up as described in [OpenSSH Setup](#openssh-setup)
 and [Passwordless SSH](#passwordless-ssh).
