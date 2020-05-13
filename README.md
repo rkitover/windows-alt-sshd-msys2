@@ -80,9 +80,32 @@ ssh mingw64
 
 etc..
 
+### Passwordless SSH
+
+To not require a password to connect to your MSYS2 sshd, use the standard
+`authorized_keys` method.
+
+First, if you do not already have an ssh key, generate one:
+
+```powershell
+ssh-keygen -t rsa -b 4096
+ssh-add ~/.ssh/id_rsa
+```
+
+You can leave the passphrase empty, if you do set it, the `ssh-agent` service
+will store it for you so you are not asked for it constantly.
+
+Then add your public key to `authorized_keys` to allow key authentication
+instead of using a password:
+
+```powershell
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+```
+
 ### Microsoft Windows Terminal Preview Setup
 
-This requires OpenSSH set up as described in [OpenSSH Setup](#openssh-setup).
+This requires OpenSSH set up as described in [OpenSSH Setup](#openssh-setup)
+and [Passwordless SSH](#passwordless-ssh).
 
 To create MSYS2 entries in the terminal session drop-down, add the following to
 your settings.json in the profiles section:
