@@ -13,6 +13,8 @@ https://gist.github.com/samhocevar/00eec26d9e9988d080ac
 This allows full terminal capability in MSYS2, which is currently not possible
 with the native OpenSSH sshd or terminal.
 
+**DOMAINS ARE NOT SUPPORTED YET! SEE: [#2](https://github.com/rkitover/windows-alt-sshd-msys2/issues/2)**
+
 ### Options
 
 The port can be specified with the `--port` or `-p` option, you can also edit
