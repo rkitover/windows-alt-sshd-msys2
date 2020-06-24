@@ -150,7 +150,7 @@ if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'\>'); then
 fi
 
 # Infinite passwd expiry
-passwd -e "${PRIV_USER}"
+passwd -d "$COMPUTERNAME" -e "${PRIV_USER}"
 
 # set required privileges
 for flag in SeAssignPrimaryTokenPrivilege SeCreateTokenPrivilege \
