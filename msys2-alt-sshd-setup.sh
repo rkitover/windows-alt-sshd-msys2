@@ -125,7 +125,15 @@ fi
 
 # Some random password; this is only needed internally by cygrunsrv and
 # is limited to 14 characters by Windows (lol)
-tmp_pass=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | dd count=14 bs=1 2>/dev/null)
+# Use some chars from different classes to satisfy domain password requirements.
+tmp_pass=$(
+  set -- '[:lower:]' 2 '[:digit:]' 4 '~!@#$%&*()_+=' 5 '[:upper:]' 3
+  while [ $# -gt 0 ]; do
+    class=$1 count=$2
+    shift; shift
+    tr -dc "$class" < /dev/urandom | dd count="$count" bs=1 2>/dev/null
+  done
+)
 
 # Delete user from previous versions of this script.
 if net user sshd_server >/dev/null 2>&1; then
