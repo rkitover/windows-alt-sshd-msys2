@@ -177,7 +177,7 @@ done
 add=$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "$(winopt /add)"; fi)
 if ! net user "${UNPRIV_USER}" ${add} $(winopt /fullname):"${UNPRIV_NAME}" \
         $(winopt /homedir):"$(cygpath -w ${EMPTY_DIR})" $(winopt /active):no; then
-    echo "ERROR: Unable to create Windows user ${PRIV_USER}"
+    echo "ERROR: Unable to create Windows user ${UNPRIV_USER}"
     exit 1
 fi
 
