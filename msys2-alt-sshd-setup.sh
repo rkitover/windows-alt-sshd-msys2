@@ -158,7 +158,7 @@ if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'\>'); then
 fi
 
 # Infinite passwd expiry
-passwd -d "$COMPUTERNAME" -e "${PRIV_USER}"
+wmic useraccount where name="'${PRIV_USER}'" set passwordexpires=false
 
 # set required privileges
 for flag in SeAssignPrimaryTokenPrivilege SeCreateTokenPrivilege \
