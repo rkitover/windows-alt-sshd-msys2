@@ -13,8 +13,6 @@ https://gist.github.com/samhocevar/00eec26d9e9988d080ac
 This allows full terminal capability in MSYS2, which is currently not possible
 with the native OpenSSH sshd or terminal.
 
-**DOMAINS ARE NOT SUPPORTED YET! SEE: [#2](https://github.com/rkitover/windows-alt-sshd-msys2/issues/2)**
-
 ### Options
 
 The port can be specified with the `--port` or `-p` option, you can also edit
@@ -22,6 +20,21 @@ The port can be specified with the `--port` or `-p` option, you can also edit
 (`/etc/ssh/sshd_config` on MSYS2 and `/etc/sshd_config` on Cygwin.)
 
 The service name is `msys2_sshd` for MSYS2 and `cygwin_sshd` for Cygwin.
+
+### Home Directory Location
+
+If you want to use your Windows profile directory as your MSYS2 or Cygwin home
+directory, put the following in `/etc/nsswitch.conf`:
+
+```
+db_home: windows
+```
+
+If you choose to do this, I recommend adding the following to your `~/.bashrc`:
+
+```bash
+alias ls="ls -h --color=auto --hide='ntuser.*' --hide='NTUSER.*'"
+```
 
 ### Installation
 

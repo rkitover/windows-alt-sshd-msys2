@@ -57,7 +57,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         *)
-            printf "Usage: $0 [--port <PORT-NUM>]\n"
+            echo >&2 "Usage: $0 [--port <PORT-NUM>]"
             exit
             ;;
     esac
@@ -144,7 +144,7 @@ fi
 add="$(if ! net user "${PRIV_USER}" >/dev/null; then echo "$(winopt /add)"; fi)"
 if ! net user "${PRIV_USER}" "${tmp_pass}" ${add} $(winopt /fullname):"${PRIV_NAME}" \
         $(winopt /homedir):"$(cygpath -w ${EMPTY_DIR})" $(winopt /yes); then
-    echo "ERROR: Unable to create Windows user ${PRIV_USER}"
+    echo >&2 "ERROR: Unable to create Windows user ${PRIV_USER}"
     exit 1
 fi
 
@@ -152,7 +152,7 @@ fi
 admingroup=$(mkgroup -l | awk -F: '{if ($2 == "S-1-5-32-544") print $1;}')
 if ! (net localgroup "${admingroup}" | grep -q '^'"${PRIV_USER}"'\>'); then
     if ! net localgroup "${admingroup}" "${PRIV_USER}" $(winopt /add); then
-        echo "ERROR: Unable to add user ${PRIV_USER} to group ${admingroup}"
+        echo >&2 "ERROR: Unable to add user ${PRIV_USER} to group ${admingroup}"
         exit 1
     fi
 fi
@@ -164,7 +164,7 @@ wmic useraccount where name="'${PRIV_USER}'" set passwordexpires=false
 for flag in SeAssignPrimaryTokenPrivilege SeCreateTokenPrivilege \
   SeTcbPrivilege SeDenyRemoteInteractiveLogonRight SeServiceLogonRight; do
     if ! $EDITRIGHTS -a "${flag}" -u "${PRIV_USER}"; then
-        echo "ERROR: Unable to give ${flag} rights to user ${PRIV_USER}"
+        echo >&2 "ERROR: Unable to give ${flag} rights to user ${PRIV_USER}"
         exit 1
     fi
 done
@@ -177,7 +177,7 @@ done
 add=$(if ! net user "${UNPRIV_USER}" >/dev/null; then echo "$(winopt /add)"; fi)
 if ! net user "${UNPRIV_USER}" ${add} $(winopt /fullname):"${UNPRIV_NAME}" \
         $(winopt /homedir):"$(cygpath -w ${EMPTY_DIR})" $(winopt /active):no; then
-    echo "ERROR: Unable to create Windows user ${UNPRIV_USER}"
+    echo >&2 "ERROR: Unable to create Windows user ${UNPRIV_USER}"
     exit 1
 fi
 
@@ -212,7 +212,7 @@ fi
 netsh advfirewall firewall delete rule name=$SERVICE 2>/dev/null || :
 
 if ! netsh advfirewall firewall add rule name=$SERVICE dir=in action=allow protocol=TCP localport=$PORT; then
-    echo "WARNING: unable to add firewall rule to open port $PORT"
+    echo >&2 "WARNING: unable to add firewall rule to open port $PORT"
 fi
 
 #
@@ -291,6 +291,11 @@ cygrunsrv -I $SERVICE -d "$SERVICE_DESC" -p \
 
 # The SSH service should start automatically when Windows is rebooted.
 if ! net start $SERVICE; then
-    echo "ERROR: Unable to start $SERVICE service"
+    echo >&2 "ERROR: Unable to start $SERVICE service"
     exit 1
+fi
+
+if [ "$('c:\windows\system32\whoami.exe' | cut -f1 -d'\' | tr 'A-Z' 'a-z')" != "$(echo "$COMPUTERNAME" | tr 'A-Z' 'a-z')" ]; then # user is domain user
+    printf "Please enter your Windows domain user password, this is needed for passwordless logon.\n\n"
+    passwd -R
 fi
