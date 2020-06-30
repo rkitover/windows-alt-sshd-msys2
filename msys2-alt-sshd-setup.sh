@@ -30,6 +30,7 @@ ETC=/etc/ssh
 PRIV_USER=sshd_server_msys2
 EDITRIGHTS=/mingw64/bin/editrights
 SSHD=/usr/bin/sshd.exe
+RUNTIME_VAR=MSYS
 
 if [ $(uname -o) = Cygwin ]; then
     SERVICE=cygwin_sshd
@@ -39,6 +40,7 @@ if [ $(uname -o) = Cygwin ]; then
     PRIV_USER=sshd_server_cygwin
     EDITRIGHTS=editrights # Comes with cygwin base.
     SSHD=/usr/sbin/sshd.exe
+    RUNTIME_VAR=CYGWIN
 fi
 
 # This is needed because msys2 rewrites everything that looks like a path.
@@ -183,7 +185,7 @@ fi
 
 
 #
-# Add or update /etc/passwd entries
+# Add or update /etc/passwd service entries
 #
 
 touch /etc/passwd
@@ -194,6 +196,20 @@ for u in "${PRIV_USER}" "${UNPRIV_USER}"; do
              >> /etc/passwd
 done
 mkgroup.exe -l > /etc/group
+
+#
+# Add or update current user and groups in /etc/passwd and /etc/group
+#
+
+u=$(whoami)
+sed -i -e '/^'"$u"':/d' /etc/passwd
+mkpasswd    -c >> /etc/passwd
+mkgroup.exe -c >> /etc/group
+
+# Remove duplicates from /etc/group
+mv /etc/group /etc/group.work
+awk '!a[$0]++' /etc/group.work > /etc/group
+rm -f /etc/group.work
 
 #
 # Set port to configured $PORT (2222 in msys2 and 2223 in cygwin by default) in
@@ -281,13 +297,22 @@ fi
 # Make sure .bash_logout returns 0 or the terminal tab will not close immediately.
 echo 'exit 0' >> ~/.bash_logout
 
+# Check for dev mode and enable real symlinks if enabled.
+dev_mode=$('c:\Windows\System32\reg.exe' query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' //v AllowDevelopmentWithoutDevLicense | grep REG_DWORD | awk '{ print $3 }' | sed 's/^0x//')
+
+symlinks=
+if [ "$dev_mode" = 1 ]; then
+    symlinks='winsymlinks:nativestrict'
+fi
+
 #
 # Finally, register service with cygrunsrv and start it
 #
 
 cygrunsrv -R $SERVICE 2>/dev/null || :
 cygrunsrv -I $SERVICE -d "$SERVICE_DESC" -p \
-          "$SSHD" -a "-D -e" -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}"
+          "$SSHD" -a "-D -e" -y tcpip -u "${PRIV_USER}" -w "${tmp_pass}" \
+	  --env "${RUNTIME_VAR}=ntsec export wincmdln $symlinks"
 
 # The SSH service should start automatically when Windows is rebooted.
 if ! net start $SERVICE; then
@@ -296,6 +321,6 @@ if ! net start $SERVICE; then
 fi
 
 if [ "$('c:\windows\system32\whoami.exe' | cut -f1 -d'\' | tr 'A-Z' 'a-z')" != "$(echo "$COMPUTERNAME" | tr 'A-Z' 'a-z')" ]; then # user is domain user
-    printf "Please enter your Windows domain user password, this is needed for passwordless logon.\n\n"
+    printf "Please enter your Windows domain user password, this is needed for passwordless logon with a key.\n\n"
     passwd -R
 fi
