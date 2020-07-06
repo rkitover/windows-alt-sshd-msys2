@@ -266,6 +266,8 @@ ssh_config=${USERPROFILE}/.ssh/config
 touch "$ssh_config"
 chmod 600 "$ssh_config"
 
+posix_username=$(whoami)
+
 if [ $(uname -o) != Cygwin ]; then
     for sys in MSYS MINGW64 MINGW32; do
         if ! grep -q "MSYSTEM=$sys" "$ssh_config"; then
@@ -276,6 +278,7 @@ if [ $(uname -o) != Cygwin ]; then
             cat >>"$ssh_config" <<EOF
 
 Host $host
+  User $posix_username
   HostName localhost
   Port $PORT
   RequestTTY yes
@@ -288,6 +291,7 @@ else
         cat >>"$ssh_config" <<EOF
 
 Host cygwin
+  User $posix_username
   HostName localhost
   Port $PORT
 EOF
@@ -295,10 +299,16 @@ EOF
 fi
 
 # Make sure .bash_logout returns 0 or the terminal tab will not close immediately.
-echo 'exit 0' >> ~/.bash_logout
+case "$(grep -Ev '^[[:space:]]*$' ~/.bash_logout 2>/dev/null | tail -n 1)" in
+    *"exit 0")
+        ;;
+    *)
+        echo 'exit 0' >> ~/.bash_logout
+        ;;
+esac
 
 # Check for dev mode and enable real symlinks if enabled.
-dev_mode=$('c:\Windows\System32\reg.exe' query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' //v AllowDevelopmentWithoutDevLicense | grep REG_DWORD | awk '{ print $3 }' | sed 's/^0x//')
+dev_mode=$("$(cygpath 'c:\Windows\System32\reg.exe')" query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' $(winopt /v) AllowDevelopmentWithoutDevLicense | grep REG_DWORD | awk '{ print $3 }' | sed 's/^0x//')
 
 symlinks=
 if [ "$dev_mode" = 1 ]; then
@@ -320,7 +330,7 @@ if ! net start $SERVICE; then
     exit 1
 fi
 
-if [ "$('c:\windows\system32\whoami.exe' | cut -f1 -d'\' | tr 'A-Z' 'a-z')" != "$(echo "$COMPUTERNAME" | tr 'A-Z' 'a-z')" ]; then # user is domain user
+if [ "$("$(cygpath 'c:\windows\system32\whoami.exe')" | cut -f1 -d'\' | tr 'A-Z' 'a-z')" != "$(echo "$COMPUTERNAME" | tr 'A-Z' 'a-z')" ]; then # user is domain user
     printf "Please enter your Windows domain user password, this is needed for passwordless logon with a key.\n\n"
     passwd -R
 fi
