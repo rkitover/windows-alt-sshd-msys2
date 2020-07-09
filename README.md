@@ -40,9 +40,18 @@ alias ls="ls -h --color=auto --hide='ntuser.*' --hide='NTUSER.*'"
 
 Download the script and read it:
 
+**(powershell)**
+
 ```powershell
-curl -LO 'https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh'
-less msys2-alt-sshd-setup.sh
+invoke-webrequest -usebasicparsing -uri "https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh" -outfile msys2-alt-sshd-setup.sh
+more msys2-alt-sshd-setup.sh
+```
+
+**(bash or cmd.exe)**
+
+```bash
+curl -LO "https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh"
+more msys2-alt-sshd-setup.sh
 ```
 
 Press Win + X and run the Administrator PowerShell or cmd prompt.

@@ -308,10 +308,11 @@ case "$(grep -Ev '^[[:space:]]*$' ~/.bash_logout 2>/dev/null | tail -n 1)" in
 esac
 
 # Check for dev mode and enable real symlinks if enabled.
-dev_mode=$("$(cygpath 'c:\Windows\System32\reg.exe')" query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' $(winopt /v) AllowDevelopmentWithoutDevLicense | grep REG_DWORD | awk '{ print $3 }' | sed 's/^0x//')
+dev_mode=$("$(cygpath 'c:\Windows\System32\reg.exe')" query 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' $(winopt /v) AllowDevelopmentWithoutDevLicense 2>/dev/null | grep REG_DWORD | awk '{ print $3 }' | sed 's/^0x//')
 
 symlinks=
 if [ "$dev_mode" = 1 ]; then
+    echo "Developer mode is ENABLED, enabling real symlink support."
     symlinks='winsymlinks:nativestrict'
 fi
 
