@@ -1,7 +1,8 @@
 #!/bin/sh
 (set -o igncr) 2>/dev/null && set -o igncr; # this comment is required
 #
-#  msys2-alt-sshd-setup.sh — configure sshd on MSYS2 on port 2222 and run it as a Windows service
+#  msys2-alt-sshd-setup.sh — configure sshd on MSYS2 on port 2222 or 2223 on
+#  Cygwin and run it as a Windows service
 #
 #  This script is a fork of this gist:
 #
@@ -9,8 +10,6 @@
 #
 #  Gotchas:
 #    — the log file will be /var/log/msys2_sshd.log
-#    — if you get error “sshd: fatal: seteuid XXX : No such device or address”
-#      in the logs, try “passwd -R” (with admin privileges)
 #
 
 set -e
@@ -260,6 +259,14 @@ for pubkey in "${USERPROFILE}"/.ssh/id_*.pub; do
         cat "$pubkey" >> ~/.ssh/authorized_keys
     fi
 done
+
+# Make sure permissions are good on the environment home directory, this is
+# especially important if using the Windows profile directory as the home
+# directory. This only has an effect on Cygwin.
+#
+# From: https://echoicdev.home.blog/2019/03/11/fix-cygwin-ssh-error-ignored-authorized-keys-bad-ownership-or-modes-for-directory/
+chown "$USER":None "$HOME"
+chmod 700 "$HOME"
 
 # Add aliases to ssh config.
 ssh_config=${USERPROFILE}/.ssh/config
