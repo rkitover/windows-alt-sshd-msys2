@@ -62,11 +62,25 @@ Start a privileged bash shell on MSYS2:
 /msys64/usr/bin/bash -l
 ```
 
-or on Cygwin:
+if you installed MSYS2 with Chocolatey, it would instead be:
+
+```powershell
+/tools/msys64/usr/bin/bash -l
+```
+.
+
+And on Cygwin:
 
 ```powershell
 /cygwin64/bin/bash -l
 ```
+
+or if you installed MSYS2 with Chocolatey, it would instead be:
+
+```powershell
+/tools/cygwin/bin/bash -l
+```
+.
 
 Go to the directory where you downloaded the script and run it:
 
@@ -185,37 +199,16 @@ your settings.json in the profiles section:
 ```json
 {
     "name": "MSYS2 - MSYS",
-    //"backgroundImage": "file://C:/Users/rkitover/Pictures/wallpapers/wallhaven-208786.jpg",
-    "backgroundImageOpacity": 0.32,
-    "backgroundImageStretchMode": "uniformToFill",
-    "fontFace": "Hack",
-    "fontSize": 10,
-    "colorScheme": "Tango Dark",
-    "cursorShape": "filledBox",
     "icon": "file://C:/msys64/msys2.ico",
     "commandline": "ssh msys2"
 },
 {
     "name": "MSYS2 - MINGW64",
-    //"backgroundImage": "file://C:/Users/rkitover/Pictures/wallpapers/wallhaven-208786.jpg",
-    "backgroundImageOpacity": 0.32,
-    "backgroundImageStretchMode": "uniformToFill",
-    "fontFace": "Hack",
-    "fontSize": 10,
-    "colorScheme": "Tango Dark",
-    "cursorShape": "filledBox",
     "icon": "file://C:/msys64/msys2.ico",
     "commandline": "ssh mingw64"
 },
 {
     "name": "MSYS2 - MINGW32",
-    //"backgroundImage": "file://C:/Users/rkitover/Pictures/wallpapers/wallhaven-208786.jpg",
-    "backgroundImageOpacity": 0.32,
-    "backgroundImageStretchMode": "uniformToFill",
-    "fontFace": "Hack",
-    "fontSize": 10,
-    "colorScheme": "Tango Dark",
-    "cursorShape": "filledBox",
     "icon": "file://C:/msys64/msys2.ico",
     "commandline": "ssh mingw32"
 },
@@ -226,19 +219,10 @@ A Cygwin entry might look like this:
 ```json
 {
     "name": "Cygwin",
-    //"backgroundImage": "file://C:/Users/rkitover/Pictures/wallpapers/wallhaven-208786.jpg",
-    "backgroundImageOpacity": 0.32,
-    "backgroundImageStretchMode": "uniformToFill",
-    "fontFace": "Hack",
-    "fontSize": 10,
-    "colorScheme": "Tango Dark",
-    "cursorShape": "filledBox",
     "icon": "file://C:/cygwin64/Cygwin-Terminal.ico",
     "commandline": "ssh cygwin"
 },
 ```
-
-To get the Hack font install "hackfont" from chocolatey.
 
 ### Limitations
 
