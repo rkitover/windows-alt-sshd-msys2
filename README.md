@@ -43,7 +43,7 @@ Download the script and read it:
 **(powershell)**
 
 ```powershell
-invoke-webrequest -usebasicparsing -uri "https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh" -outfile msys2-alt-sshd-setup.sh
+iwr https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh -outfile msys2-alt-sshd-setup.sh
 more msys2-alt-sshd-setup.sh
 ```
 
@@ -231,7 +231,7 @@ for this is described here:
 
 https://stackoverflow.com/questions/267838/how-can-a-windows-service-execute-a-gui-application
 
-However, there is a working workaround.
+However, there is a workaround.
 
 Just start a tmux session in mintty, detach from it, then attach to it in the
 ssh session, and you will be able to launch GUI apps.
