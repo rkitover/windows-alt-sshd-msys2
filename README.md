@@ -21,6 +21,8 @@ The port can be specified with the `--port` or `-p` option, you can also edit
 
 The service name is `msys2_sshd` for MSYS2 and `cygwin_sshd` for Cygwin.
 
+To uninstall the service, use `--uninstall` or `-u`.
+
 ### Home Directory Location
 
 If you want to use your Windows profile directory as your MSYS2 or Cygwin home
