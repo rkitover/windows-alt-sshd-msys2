@@ -189,6 +189,37 @@ cat "${USERPROFILE}/.ssh/id_rsa.pub" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
+Note that the Windows sshd does not by default use this location for the
+authorized_keys file for users in the Administrators group. In this case, this
+does not matter because the MSYS2/Cygwin sshd does, but if you set your
+MSYS2/Cygwin home directory to your profile directory, and you are in the
+Administrators group, and you want to use the same authorized_keys file for
+both, then edit `C:\ProgramData\ssh\sshd_config` and comment out these lines by
+putting a `#` in front of each one:
+
+```sshconfig
+Match Group administrators
+       AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
+```
+.
+
+This can be done with this command:
+
+```powershell
+sed -i 's/.*administrators.*/#&/g' /programdata/ssh/sshd_config
+```
+.
+
+Make sure to fix the permissions on the `~/.ssh` files in your profile directory
+by running the following from PowerShell:
+
+```powershell
+&(resolve-path /prog*s/openssh*/fixuserfilepermissions.ps1)
+import-module -force $(resolve-path /prog*s/openssh*/opensshutils.psd1)
+repair-authorizedkeypermission -file ~/.ssh/authorized_keys
+```
+, the script does this as well.
+
 ### Microsoft Windows Terminal Setup
 
 This requires OpenSSH set up as described in [OpenSSH Setup](#openssh-setup)
