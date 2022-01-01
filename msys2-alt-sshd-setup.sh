@@ -296,9 +296,6 @@ EOF
         fi
     done
 
-    # Make sure key and authorized_keys Windows permissions are correct.
-    fix_permissions
-
     # Make sure permissions are good on the environment home directory, this is
     # especially important if using the Windows profile directory as the home
     # directory. This only has an effect on Cygwin.
@@ -328,7 +325,7 @@ Host $host
   HostName localhost
   Port $PORT
   RequestTTY yes
-  RemoteCommand MSYSTEM=$sys exec bash -l
+  RemoteCommand MSYSTEM=$sys MSYS2_PATH_TYPE=inherit exec bash -l
 EOF
             fi
         done
@@ -343,6 +340,17 @@ Host cygwin
 EOF
         fi
     fi
+
+    # Change ssh config to UNIX line endings. Sometimes it has DOS
+    # line endings if it's in the user's profile dir, and this
+    # script corrupts the file by writing text with UNIX line
+    # endings.
+    tr -d '\r' < "$ssh_config" > "${ssh_config}.new"
+    mv -f "${ssh_config}.new" "$ssh_config"
+
+    # Make sure all ssh files in the profile dir have correct
+    # Windows permissions.
+    fix_permissions
 
     # Make sure .bash_logout returns 0 or the terminal tab will not close immediately.
     case "$(grep -Ev '^[[:space:]]*$' ~/.bash_logout 2>/dev/null | tail -n 1)" in
@@ -393,8 +401,6 @@ fix_permissions() {
     curl -sLO https://raw.githubusercontent.com/PowerShell/openssh-portable/latestw_all/contrib/win32/openssh/OpenSSHUtils.psd1
     curl -sLO https://raw.githubusercontent.com/PowerShell/openssh-portable/latestw_all/contrib/win32/openssh/OpenSSHUtils.psm1
 
-    echo "PWSH: $pwsh"
-
     "$pwsh" $pwsh_args -file ./FixUserFilePermissions.ps1
 
     if [ -f "${USERPROFILE}/.ssh/authorized_keys" ]; then
@@ -431,3 +437,5 @@ uninstall() {
 }
 
 main "$@"
+
+# vim:sw=4 et:
