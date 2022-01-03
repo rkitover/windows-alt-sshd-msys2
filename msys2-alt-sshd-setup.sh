@@ -86,11 +86,10 @@ get_apt_cyg() {
     # This is my fork of apt-cyg that supports using curl instead of wget.
     # Windows comes with curl now.
     mkdir -p /tmp/apt-cyg
-    curl -L https://raw.githubusercontent.com/rkitover/apt-cyg/master/apt-cyg -o "$(cygpath -w /tmp/apt-cyg/apt-cyg)"
+    curl -sL https://raw.githubusercontent.com/rkitover/apt-cyg/master/apt-cyg -o "$(cygpath -w /tmp/apt-cyg/apt-cyg)"
 
     # apt-cyg expects to be able to run itself via PATH.
     chmod +x /tmp/apt-cyg/apt-cyg
-    export PATH=/tmp/apt-cyg:$PATH
     apt_cyg="bash /tmp/apt-cyg/apt-cyg"
 }
 
