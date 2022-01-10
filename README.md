@@ -257,6 +257,27 @@ A Cygwin entry might look like this:
 },
 ```
 
+### Restarting on Package Upgrades
+
+When you do MSYS2 or Cygwin upgrades, if core components are updated
+it will kill all processes including the `sshd` service process,
+before you can connect again you must run:
+
+```powershell
+start-service msys2_sshd
+# or for Cygwin
+start-service cygwin_sshd
+```
+, in an Administrator PowerShell prompt, or from an Administrator
+`cmd.exe` prompt:
+
+```dosbatch
+net start msys2_sshd
+@rem or for Cygwin
+net start cygwin_sshd
+```
+.
+
 ### Limitations
 
 It is not possible to run GUI apps from these ssh sessions directly, the reason
@@ -268,3 +289,5 @@ However, there is a workaround.
 
 Just start a tmux session in mintty, detach from it, then attach to it in the
 ssh session, and you will be able to launch GUI apps.
+
+<!--- vim:set et sw=4 tw=68: --->
