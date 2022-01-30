@@ -40,23 +40,23 @@ alias ls="ls -h --color=auto --hide='ntuser.*' --hide='NTUSER.*'"
 
 ### Installation
 
-Download the script and read it:
+Download the script and read it,
 
-**(powershell)**
+For **(powershell)**:
 
 ```powershell
 iwr https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh -outfile msys2-alt-sshd-setup.sh
 more msys2-alt-sshd-setup.sh
 ```
 
-**(bash or cmd.exe)**
+. And for **(bash or cmd.exe)**:
 
 ```bash
 curl -LO "https://raw.githubusercontent.com/rkitover/windows-alt-sshd-msys2/master/msys2-alt-sshd-setup.sh"
 more msys2-alt-sshd-setup.sh
 ```
 
-Press Win + X and run the Administrator PowerShell or cmd prompt.
+. Press Win + X and run the Administrator PowerShell or cmd prompt.
 
 Start a privileged bash shell on MSYS2:
 
@@ -64,33 +64,31 @@ Start a privileged bash shell on MSYS2:
 /msys64/usr/bin/bash -l
 ```
 
-if you installed MSYS2 with Chocolatey, it would instead be:
+, if you installed MSYS2 with Chocolatey, it would instead be:
 
 ```powershell
 /tools/msys64/usr/bin/bash -l
 ```
-.
 
-And on Cygwin:
+. And on Cygwin:
 
 ```powershell
 /cygwin64/bin/bash -l
 ```
 
-or if you installed MSYS2 with Chocolatey, it would instead be:
+, or if you installed MSYS2 with Chocolatey, it would instead be:
 
 ```powershell
 /tools/cygwin/bin/bash -l
 ```
-.
 
-Go to the directory where you downloaded the script and run it:
+. Go to the directory where you downloaded the script and run it:
 
 ```bash
 bash msys2-alt-sshd-setup.sh
 ```
 
-The firewall rule is created automatically.
+. The firewall rule is created automatically.
 
 ### OpenSSH Setup
 
@@ -124,6 +122,9 @@ Host mingw32
   RemoteCommand MSYSTEM=MINGW32 bash -l
 ```
 
+, the scripts also adds all the other `MSYSTEM` environments, the
+full list is [here](https://www.msys2.org/docs/environments/).
+
 For Cygwin it would be:
 
 ```
@@ -132,8 +133,8 @@ Host cygwin
   Port 2223
 ```
 
-If you are doing this on a remote host, replace localhost with your Windows
-host.
+. If you are doing this on a remote host, replace localhost with
+your Windows host.
 
 This can be done on Windows or Linux etc..
 
@@ -143,19 +144,19 @@ Then to connect to the MSYS2 sshd you would simply run:
 ssh msys2
 ```
 
-or
+, or
 
 ```powershell
 ssh mingw64
 ```
 
-or to connect to Cygwin:
+, or to connect to Cygwin:
 
 ```powershell
 ssh cygwin
 ```
 
-etc..
+, etc..
 
 ### Passwordless SSH
 
@@ -172,7 +173,7 @@ ssh-keygen -t rsa -b 4096
 ssh-add ~/.ssh/id_rsa
 ```
 
-You can leave the passphrase empty, if you do set it, the `ssh-agent` service
+. You can leave the passphrase empty, if you do set it, the `ssh-agent` service
 will store it for you so you are not asked for it constantly.
 
 Then add your public key to `authorized_keys` to allow key authentication
@@ -189,7 +190,7 @@ cat "${USERPROFILE}/.ssh/id_rsa.pub" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-Note that the Windows sshd does not by default use this location for the
+. Note that the Windows sshd does not by default use this location for the
 authorized_keys file for users in the Administrators group. In this case, this
 does not matter because the MSYS2/Cygwin sshd does, but if you set your
 MSYS2/Cygwin home directory to your profile directory, and you are in the
@@ -201,16 +202,14 @@ putting a `#` in front of each one:
 Match Group administrators
        AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
 ```
-.
 
-This can be done with this command:
+. This can be done with this command:
 
 ```powershell
 sed -i 's/.*administrators.*/#&/g' /programdata/ssh/sshd_config
 ```
-.
 
-Make sure to fix the permissions on the `~/.ssh` files in your profile directory
+. Make sure to fix the permissions on the `~/.ssh` files in your profile directory
 by running the following from PowerShell:
 
 ```powershell
@@ -218,6 +217,7 @@ by running the following from PowerShell:
 import-module -force $(resolve-path /prog*s/openssh*/opensshutils.psd1)
 repair-authorizedkeypermission -file ~/.ssh/authorized_keys
 ```
+
 , the script does this as well.
 
 ### Microsoft Windows Terminal Setup
@@ -247,7 +247,7 @@ your settings.json in the profiles section:
 },
 ```
 
-A Cygwin entry might look like this:
+. A Cygwin entry might look like this:
 
 ```json
 {
@@ -256,6 +256,7 @@ A Cygwin entry might look like this:
     "commandline": "ssh cygwin"
 },
 ```
+.
 
 ### Restarting on Package Upgrades
 
@@ -281,9 +282,7 @@ net start cygwin_sshd
 ### Limitations
 
 It is not possible to run GUI apps from these ssh sessions directly, the reason
-for this is described here:
-
-https://stackoverflow.com/questions/267838/how-can-a-windows-service-execute-a-gui-application
+for this is described [here](https://stackoverflow.com/questions/267838/how-can-a-windows-service-execute-a-gui-application).
 
 However, there is a workaround.
 

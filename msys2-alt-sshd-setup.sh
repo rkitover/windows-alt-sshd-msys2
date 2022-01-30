@@ -311,7 +311,7 @@ EOF
     posix_username=$(whoami)
 
     if [ $(uname -o) != Cygwin ]; then
-        for sys in MSYS MINGW64 MINGW32; do
+        for sys in MSYS MINGW64 MINGW32 UCRT64 CLANG64 CLANG32 CLANGARM64; do
             if ! grep -q "MSYSTEM=$sys" "$ssh_config"; then
                 # For host alias, lowercase and rename 'msys' -> 'msys2'.
                 host=$(echo "$sys" | tr 'A-Z' 'a-z')
