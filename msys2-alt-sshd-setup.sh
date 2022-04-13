@@ -300,7 +300,7 @@ EOF
     # directory. This only has an effect on Cygwin.
     #
     # From: https://echoicdev.home.blog/2019/03/11/fix-cygwin-ssh-error-ignored-authorized-keys-bad-ownership-or-modes-for-directory/
-    chown "$USER":None "$HOME"
+    chown "$USER":$(id -g) "$HOME"
     chmod 700 "$HOME"
 
     # Add aliases to ssh config.
