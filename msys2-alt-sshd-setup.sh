@@ -313,6 +313,14 @@ EOF
     if [ $(uname -o) != Cygwin ]; then
         for sys in MSYS MINGW64 MINGW32 UCRT64 CLANG64 CLANG32 CLANGARM64; do
             if ! grep -q "MSYSTEM=$sys" "$ssh_config"; then
+                # Only use MSYS2_PATH_TYPE=inherit for MSYS and MINGW, it breaks things for CLANG*.
+                inherit=
+                case "$sys" in
+                    MSYS|MINGW*)
+                        inherit='MSYS2_PATH_TYPE=inherit'
+                        ;;
+                esac
+
                 # For host alias, lowercase and rename 'msys' -> 'msys2'.
                 host=$(echo "$sys" | tr 'A-Z' 'a-z')
                 [ "$host" = msys ] && host=msys2
@@ -324,7 +332,7 @@ Host $host
   HostName localhost
   Port $PORT
   RequestTTY yes
-  RemoteCommand MSYSTEM=$sys MSYS2_PATH_TYPE=inherit exec bash -l
+  RemoteCommand MSYSTEM=$sys $inherit exec bash -l
 EOF
             fi
         done
